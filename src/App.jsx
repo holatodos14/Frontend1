@@ -1,31 +1,36 @@
-import { Router, Route, Switch } from 'wouter'
+import { Route, Switch } from 'wouter'
 import { AuthProvider } from './context/AuthContext'
 import Header from './components/Header'
-import Footer from './components/Footer'  // This import should now work
-import Login from './pages/Login'
-import UserDashboard from './pages/users/Dashboard'
-import ReportIncident from './pages/users/ReportIncident'
+import Dashboard from './pages/users/Dashboard'
 import AdminDashboard from './pages/admin/AdminDashboard'
-import ManageIncidents from './pages/admin/ManageIncidents'
+import Login from './pages/Login'
+import ReportIncident from './pages/users/ReportIncident'
+import ProtectedRoute from './pages/ProtectedRoute'
+import NotFound from './pages/NotFound'  // Optional: for handling 404 errors
 
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <div className="flex flex-col min-h-screen">
-          <Header />
-          <main className="flex-grow container mx-auto px-4 py-8">
+      <Header />
+      <main className="p-4">
+        <Switch>
+          <Route path="/" component={Login} />
+          
+          <ProtectedRoute>
             <Switch>
-              <Route path="/login" component={Login} />
-              <Route path="/dashboard" component={UserDashboard} />
+              <Route path="/dashboard" component={Dashboard} />
               <Route path="/report-incident" component={ReportIncident} />
-              <Route path="/admin" component={AdminDashboard} />
-              <Route path="/admin/manage-incidents" component={ManageIncidents} />
+              <Route path="/admin/dashboard" component={AdminDashboard} />
+              
             </Switch>
-          </main>
-          <Footer />
-        </div>
-      </Router>
+          </ProtectedRoute>
+          
+          <Route path="/404" component={NotFound} />
+          <Route>
+            <NotFound />
+          </Route>
+        </Switch>
+      </main>
     </AuthProvider>
   )
 }

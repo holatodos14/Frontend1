@@ -1,8 +1,8 @@
-// src/pages/users/ReportIncident.jsx
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import { useLocation } from 'wouter'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createIncident } from '../../services/api'
+import { AuthContext } from '../../context/AuthContext'
 
 function ReportIncident() {
   const [title, setTitle] = useState('')
@@ -10,6 +10,7 @@ function ReportIncident() {
   const [location, setLocation] = useState('')
   const [, setLocationHook] = useLocation()
   const queryClient = useQueryClient()
+  const { user } = useContext(AuthContext)
 
   const mutation = useMutation({
     mutationFn: createIncident,
@@ -21,7 +22,7 @@ function ReportIncident() {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    mutation.mutate({ title, description, location })
+    mutation.mutate({ title, description, location, userId: user.id })
   }
 
   return (

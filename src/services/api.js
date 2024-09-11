@@ -2,27 +2,61 @@ import axios from 'axios'
 
 const API_URL = 'http://localhost:3000/api/'
 
-const api = axios.create({
-  baseURL: API_URL,
-})
-
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+export const login = async (data) => {
+  try {
+    const res = await axios.post('http://localhost:3000/api/auth/login', data)
+    return res.data
+  } catch (error) {
+    console.error('Error logging in:', error.response ? error.response.data : error.message)
+    throw error
   }
-  return config
-})
-
-export function getIncidents() {
-  return api.get('/incidents')
 }
 
-export function createIncident(incidentData) {
-  return api.post('/incidents', incidentData)
+export const getMyInformation = async () => {
+  try {
+    const token = localStorage.getItem('tokenLogin');
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+    
+    const info = await axios.get('http://localhost:3000/api/auth/me', {
+      headers: { Authorization: token },
+    });
+    
+    return info.data;
+  } catch (error) {
+    console.error('Error fetching user information:', error.response ? error.response.data : error.message);
+    throw error;
+  }
+};
+
+export const getIncidents = async () => {
+  try {
+    const incidents = await axios.get('http://localhost:3000/api/incidents')
+    return incidents.data
+  } catch (error) {
+    console.error('Error fetching incidents:', error.response ? error.response.data : error.message)
+    throw error
+  }
 }
 
-export function updateIncidentStatus(id, status) {
-  return api.put(`/incidents/${id}`, { status })
+export const createIncident = async (data) => {
+  try {
+    const createIncident = await axios.post('http://localhost:3000/api/incidents/', data)
+    return createIncident.data
+  } catch (error) {
+    console.error('Error creating incident:', error.response ? error.response.data : error.message)
+    throw error
+  }
 }
-export default api
+
+// Modified updateIncidentStatus using axios directly
+export const updateIncidentStatus = async (id, status) => {
+  try {
+    const response = await axios.put(`${API_URL}/incidents/${id}`, { status })
+    return response.data
+  } catch (error) {
+    console.error(`Error updating status for incident ${id}:`, error.response ? error.response.data : error.message)
+    throw error
+  }
+}
